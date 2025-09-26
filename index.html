@@ -578,37 +578,27 @@
             }
         }
 
-        // Handle location input changes for autocomplete
-        document.getElementById('locationInput').addEventListener('input', function(e) {
-            const query = e.target.value;
-            if (query.length > 2) {
-                ensureGoogleMapsLoaded();
-                if (isGoogleMapsLoaded) {
-                    getAutocompletePredictions(query);
-                }
-            } else {
+        // Handle location input changes for autocomplete (server-side)
+        document.getElementById('locationInput').addEventListener('input', async function(e) {
+            const query = e.target.value.trim();
+            if (query.length <= 2) {
                 hideAutocomplete();
+                return;
             }
+            try {
+                const res = await fetch(N8N_WEBHOOK_URL.replace('analyze-reviews', 'places-autocomplete'), {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                if (!res.ok) return hideAutocomplete();
+                const data = await res.json();
+                const predictions = data.predictions || [];
+                showAutocompleteSuggestions(predictions.map(p => ({ description: p.description, place_id: p.place_id })));
+            } catch { hideAutocomplete(); }
         });
 
         // Get autocomplete predictions
-        function getAutocompletePredictions(query) {
-            if (!autocompleteService) {
-                console.error('Autocomplete service not initialized');
-                return;
-            }
-
-            autocompleteService.getPlacePredictions({
-                input: query,
-                types: ['establishment']
-            }, (predictions, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-                    showAutocompleteSuggestions(predictions);
-                } else {
-                    hideAutocomplete();
-                }
-            });
-        }
+        // removed client-side autocomplete (now server-side)
 
         // Show autocomplete suggestions
         function showAutocompleteSuggestions(predictions) {
@@ -663,23 +653,18 @@
         }
 
         // Find place by text search
-        function findPlaceByText(query) {
-            if (!placesService) {
-                showError('Places service not initialized');
-                return;
-            }
-
-            const request = {
-                query: query
-            };
-
-            placesService.textSearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
-                    analyzeLocation(results[0].place_id);
-                } else {
-                    showError(t('locationNotFound'));
-                }
-            });
+        async function findPlaceByText(query) {
+            try {
+                const res = await fetch(N8N_WEBHOOK_URL.replace('analyze-reviews', 'place-search'), {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                if (!res.ok) return showError(t('locationNotFound'));
+                const data = await res.json();
+                const first = (data.results || [])[0];
+                if (first && first.place_id) return analyzeLocation(first.place_id);
+                showError(t('locationNotFound'));
+            } catch { showError(t('locationNotFound')); }
         }
 
         // Analyze location using n8n webhook
