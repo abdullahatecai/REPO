@@ -558,25 +558,9 @@
         });
 
         // Initialize Google Maps services
-        function initMap() {
-            try {
-                const map = new google.maps.Map(document.createElement('div'));
-                autocompleteService = new google.maps.places.AutocompleteService();
-                placesService = new google.maps.places.PlacesService(map);
-                isGoogleMapsLoaded = true;
-                console.log('Google Maps services initialized successfully');
-            } catch (error) {
-                console.error('Error initializing Google Maps:', error);
-                showError('Failed to initialize Google Maps. Please check your API key.');
-            }
-        }
-
-        // Fallback initialization if callback fails
-        function ensureGoogleMapsLoaded() {
-            if (!isGoogleMapsLoaded && window.google && window.google.maps) {
-                initMap();
-            }
-        }
+        // Google Maps JS no longer required; using server-side endpoints instead
+        function initMap() {}
+        function ensureGoogleMapsLoaded() {}
 
         // Handle location input changes for autocomplete (server-side)
         document.getElementById('locationInput').addEventListener('input', async function(e) {
@@ -637,12 +621,7 @@
                 return;
             }
 
-            ensureGoogleMapsLoaded();
-            
-            if (!isGoogleMapsLoaded) {
-                showError(t('mapsNotLoaded'));
-                return;
-            }
+            // No client-side Maps dependency; proceed directly
 
             if (selectedPlace) {
                 analyzeLocation(selectedPlace.place_id);
@@ -882,17 +861,6 @@
         });
     </script>
     
-    <!-- Load Google Maps API with error handling -->
-    <script>
-        // Global error handler for Google Maps
-        window.gm_authFailure = function() {
-            console.error('Google Maps authentication failed');
-            showError('Google Maps authentication failed. Please check your API key and billing settings.');
-        };
-    </script>
-    <script async defer 
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7LBuBDBVcPeYQvHwqK2M3kZoI7hrcZMo&libraries=places&callback=initMap&loading=async"
-        onerror="showError('Failed to load Google Maps. Please check your internet connection.')">
-    </script>
+    <!-- Google Maps JS removed: using secure server-side endpoints in n8n -->
 </body>
 </html>
