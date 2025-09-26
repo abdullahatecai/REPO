@@ -384,7 +384,17 @@
 
             /* Stack bars on mobile to avoid overlap */
             .sentiment-bars { flex-direction: column; border-radius: 10px; gap: 6px; background: transparent; }
-            .sentiment-bar { width: 100% !important; height: 38px; border-left: 0; border-radius: 8px; font-size: 12px; }
+            .sentiment-bar {
+                width: 100% !important;
+                border-left: 0;
+                border-radius: 8px;
+                font-size: 13px;
+                padding: 8px 10px;
+                white-space: normal; /* allow wrapping for long Arabic labels */
+                overflow: visible;   /* avoid text being clipped */
+                height: auto;
+                min-height: 40px;
+            }
         }
     </style>
 </head>
