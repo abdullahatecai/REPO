@@ -203,8 +203,7 @@
         }
 
         .sentiment-bars {
-            display: grid;
-            grid-auto-flow: column;
+            display: flex;
             gap: 2px;
             margin-top: 15px;
             width: 100%;
@@ -789,9 +788,28 @@
                 setBar(neutEl, t('neutral'), neutPercent);
                 setBar(negEl, t('negative'), negPercent);
 
-                // Use CSS grid columns to guarantee ordering and prevent overlap
+                // Optionally set CSS grid columns for compatibility (no effect with flex)
                 const cols = `${Math.max(posPercent, 1)}fr ${Math.max(neutPercent, 1)}fr ${Math.max(negPercent, 1)}fr`;
                 document.querySelector('.sentiment-bars').style.gridTemplateColumns = cols;
+
+                // Set bar widths for desktop, stack full width on mobile
+                function applyBarWidths() {
+                    if (window.innerWidth > 576) {
+                        posEl.style.width = `${Math.max(posPercent, 2)}%`;
+                        neutEl.style.width = `${Math.max(neutPercent, 2)}%`;
+                        negEl.style.width = `${Math.max(negPercent, 2)}%`;
+                        document.querySelector('.sentiment-bars').style.flexDirection = 'row';
+                    } else {
+                        document.querySelector('.sentiment-bars').style.flexDirection = 'column';
+                        [posEl, neutEl, negEl].forEach(el => { el.style.width = '100%'; });
+                    }
+                }
+                applyBarWidths();
+
+                if (!window.__sentimentResizeAttached) {
+                    window.addEventListener('resize', applyBarWidths);
+                    window.__sentimentResizeAttached = true;
+                }
             }
 
             // Display reviews
