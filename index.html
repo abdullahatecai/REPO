@@ -761,12 +761,26 @@
                 const neutEl = document.getElementById('neutralBar');
                 const negEl = document.getElementById('negativeBar');
 
-                posEl.textContent = `${t('positive')}: ${posPercent}%`;
-                neutEl.textContent = `${t('neutral')}: ${neutPercent}%`;
-                negEl.textContent = `${t('negative')}: ${negPercent}%`;
+                // Helper to keep labels readable on very small segments
+                function setBar(el, label, percent) {
+                    let text = `${label}: ${percent}%`;
+                    if (percent <= 10) {
+                        el.style.fontSize = '11px';
+                        text = `${label.charAt(0)}: ${percent}%`;
+                    } else if (percent <= 18) {
+                        el.style.fontSize = '12px';
+                    } else {
+                        el.style.fontSize = '13px';
+                    }
+                    el.textContent = text;
+                }
+
+                setBar(posEl, t('positive'), posPercent);
+                setBar(neutEl, t('neutral'), neutPercent);
+                setBar(negEl, t('negative'), negPercent);
 
                 // Use CSS grid columns to guarantee ordering and prevent overlap
-                const cols = `${posPercent}fr ${neutPercent}fr ${negPercent}fr`;
+                const cols = `${Math.max(posPercent, 1)}fr ${Math.max(neutPercent, 1)}fr ${Math.max(negPercent, 1)}fr`;
                 document.querySelector('.sentiment-bars').style.gridTemplateColumns = cols;
             }
 
