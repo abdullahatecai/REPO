@@ -203,8 +203,9 @@
         }
 
         .sentiment-bars {
-            display: flex;
-            gap: 0;
+            display: grid;
+            grid-auto-flow: column;
+            gap: 2px;
             margin-top: 15px;
             width: 100%;
             overflow: hidden;
@@ -213,8 +214,6 @@
         }
 
         .sentiment-bar {
-            flex: 0 0 auto;
-            width: 0;
             height: 30px;
             display: flex;
             align-items: center;
@@ -227,8 +226,6 @@
             box-sizing: border-box;
             font-size: 13px;
         }
-
-        .sentiment-bar + .sentiment-bar { border-left: 2px solid rgba(255,255,255,0.6); }
 
         .positive { background: linear-gradient(135deg, #56ab2f, #a8e6cf); }
         .neutral { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
@@ -759,15 +756,18 @@
                 const posPercent = Math.round((sentiment.positive / total) * 100);
                 const neutPercent = Math.round((sentiment.neutral / total) * 100);
                 const negPercent = Math.round((sentiment.negative / total) * 100);
-                
-                document.getElementById('positiveBar').textContent = `${t('positive')}: ${posPercent}%`;
-                document.getElementById('neutralBar').textContent = `${t('neutral')}: ${neutPercent}%`;
-                document.getElementById('negativeBar').textContent = `${t('negative')}: ${negPercent}%`;
-                
-                // Update bar widths precisely by percentage
-                document.getElementById('positiveBar').style.width = posPercent + '%';
-                document.getElementById('neutralBar').style.width = neutPercent + '%';
-                document.getElementById('negativeBar').style.width = negPercent + '%';
+
+                const posEl = document.getElementById('positiveBar');
+                const neutEl = document.getElementById('neutralBar');
+                const negEl = document.getElementById('negativeBar');
+
+                posEl.textContent = `${t('positive')}: ${posPercent}%`;
+                neutEl.textContent = `${t('neutral')}: ${neutPercent}%`;
+                negEl.textContent = `${t('negative')}: ${negPercent}%`;
+
+                // Use CSS grid columns to guarantee ordering and prevent overlap
+                const cols = `${posPercent}fr ${neutPercent}fr ${negPercent}fr`;
+                document.querySelector('.sentiment-bars').style.gridTemplateColumns = cols;
             }
 
             // Display reviews
