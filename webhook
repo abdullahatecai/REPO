@@ -463,7 +463,7 @@
 
     <script>
         // Configuration - Replace with your actual values
-        const N8N_WEBHOOK_URL = 'https://ochery-giuseppe-pseudointellectually.ngrok-free.dev/webhook/analyze-reviews';
+        const N8N_WEBHOOK_URL = 'https://ochery-giuseppe-pseudointellectually.ngrok-free.dev/webhook-test/analyze-reviews';
 
         let autocompleteService;
         let placesService;
